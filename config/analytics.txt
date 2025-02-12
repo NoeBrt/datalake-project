@@ -1,0 +1,13 @@
+[roi-filtering-stream-0]
+enable = 1
+inverse-roi = 0
+class-id = -1
+roi-0 = 426;289;349;357;254;341;213;256;197;179;334;122;424;159;
+
+[property]
+enable = 0
+config-width = 640
+config-height = 480
+osd-mode = 2
+display-font-size = 8
+

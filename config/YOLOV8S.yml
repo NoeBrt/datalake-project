@@ -1,0 +1,42 @@
+################################################################################
+# SPDX-FileCopyrightText: Copyright (c) 2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: LicenseRef-NvidiaProprietary
+#
+# NVIDIA CORPORATION, its affiliates and licensors retain all intellectual
+# property and proprietary rights in and to this material, related
+# documentation and any modifications thereto. Any use, reproduction,
+# disclosure or distribution of this material and related documentation
+# without an express license agreement from NVIDIA CORPORATION or
+# its affiliates is strictly prohibited.
+################################################################################
+
+property:
+  gpu-id: 0  # Ensure you're using the correct GPU ID
+  net-scale-factor: 0.0039215697906911373  # Normalize the input images (1/255)
+  model-color-format: 0  # 0 for RGBA, ensure this matches your model's expected format
+  onnx-file: ../model/yolov8s.onnx  # Path to the ONNX model file
+  int8-calib-file: calib.table  # Uncomment if using INT8 precision; specify your calibration file
+  labelfile-path: ../model//labels.txt  # Path to the label file
+  model-engine-file: ../model_b1_gpu0_fp16.engine   # Path to the TensorRT engine file
+  batch-size: 1  # Consider increasing if you can afford the memory (e.g., 2 or 4)
+  network-mode: 2  # 0 for FP32, 1 for INT8, 2 for FP16 (adjust based on your accuracy/performance needs)
+  num-detected-classes: 80  # Total number of classes in your model
+  interval: 0  # Process every frame; adjust for performance vs. accuracy trade-offs
+  gie-unique-id: 1  # Unique ID for this GIE (can be incremented if multiple GIEs are used)
+  process-mode: 1  # 1 for synchronous, consider 0 for asynchronous if applicable
+  network-type: 0  # 0 for primary GIE (could use 1 for secondary)
+  cluster-mode: 2  # 2 for clustering based on NMS
+  maintain-aspect-ratio: 1  # Keep aspect ratio of input images
+  symmetric-padding: 1  # Use symmetric padding to avoid distortion
+  force-implicit-batch-dim: 1  # Set to 1 if your model uses implicit batch size (recommended for most use cases)
+  workspace-size: 2000  # Increase workspace size for larger models; tune based on GPU memory
+  parse-bbox-func-name: NvDsInferParseYoloCuda  # Ensure this is the optimized function for YOLO
+  custom-lib-path: ../nvdsinfer_custom_impl_Yolo/libnvdsinfer_custom_impl_Yolo.so  # Path to custom library
+  engine-create-func-name: NvDsInferYoloCudaEngineGet  # Function name for engine creation
+  filter-out-class-ids: 4;6;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23;24;25;26;27;28;29;30;31;32;33;34;35;36;37;38;39;40;41;42;43;44;45;46;47;48;49;50;51;52;53;54;55;56;57;58;59;60;61;62;63;64;65;66;67;68;69;70;71;72;73;74;75;76;77;78;79;80  # IDs to filter out, ensure these are correct based on your use case
+
+class-attrs-all:
+  pre-cluster-threshold: 0.2  # Adjust based on your requirements
+  eps: 0.2  # Tune for NMS sensitivity
+  group-threshold: 1  # Keep as is for single detection; increase if grouping is needed
+
