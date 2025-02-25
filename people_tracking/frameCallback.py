@@ -10,7 +10,7 @@ from datetime import datetime
 ROTATE_FILE_TIME = 60 # seconds
 FILE_NAME = "vision"
 EXTENSION = "csv"
-DATA_FOLDER = "data"
+DATA_FOLDER = "../data/yolo_results"
 
 
 # Ensure the data folder exists
