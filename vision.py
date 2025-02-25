@@ -23,7 +23,7 @@ def main():
         '! nvinfer name="primary-inference" config-file-path="./config/YOLOV8S.yml" '
         '! nvtracker tracker-width=640 tracker-height=384 gpu-id=0 '
         'll-lib-file="/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so" '
-        'll-config-file="./config/config_tracker_NvDCF_perf.yml" '
+        'll-config-file="./config/config_tracker_NvDCF_perf.ymtracker_config.yml" '
         '! nvdsanalytics name="analytics" config-file="./config/analytics.txt" '
         '! nvvideoconvert '
         '! nvdsosd '
@@ -37,7 +37,7 @@ def main():
         return
 
     # Attach the probe callback to nvinfer’s src pad
-    nvinfer = pipeline.get_by_name("primary-inference")
+    nvinfer = pipeline.get_by_name("analytics")
     if nvinfer:
         nvinfer_src_pad = nvinfer.get_static_pad("src")
         if nvinfer_src_pad:
