@@ -1,6 +1,9 @@
 # DeepStream Pipeline with Kafka, S3, MySQL, and Airflow
 
-![](test.webdm)
+
+https://github.com/user-attachments/assets/f7a32bf8-9c29-4fd9-880d-b0014a6534ad
+
+
 
 ## Prerequisites
 
