@@ -1,5 +1,7 @@
 # DeepStream Pipeline with Kafka, S3, MySQL, and Airflow
 
+![](test.webdm)
+
 ## Prerequisites
 
 Ensure you have the following dependencies installed:
@@ -20,7 +22,7 @@ To initialize the environment, set up Docker services, MySQL database, and AWS S
 sh ./setup.sh
 ```
 
-⚠️ The **process staging** step takes approximately **50 seconds** to execute.
+⚠️ The **process staging**  sleep **50 seconds** before executing to avoid running when the topic is not created
 
 To gracefully stop Docker services, run:
 
