@@ -94,7 +94,7 @@ We use a Nvidia Deesptream pipeline with one YOLOV8s inference layer and a track
         '! nveglglessink'
 ```
 
-A probe callback process each frame and extract the metadata.
+A probe callback (```people_tracking/frameCallback.py```) process each frame and extract the metadata.
 
 - Kafka topic: `raw`
 - Format: JSON
