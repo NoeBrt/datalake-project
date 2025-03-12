@@ -165,6 +165,8 @@ CREATE TABLE processed_files (
 
 ## **Airflow Orchestration (DAGs)**
 
+http://localhost:8081
+
 ### **DAG: kafka_to_s3_to_sql_pipeline**
 
 This DAG automates the process of detecting new Parquet files in **S3**, processing them, and loading data into **MySQL**.
