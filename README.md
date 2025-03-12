@@ -25,6 +25,14 @@ Ensure you have the following dependencies installed:
 - **Kafka**
 - **Apache Airflow**
 
+### python dependancies 
+
+```
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirement.txt
+```
+
 ## Setup
 
 To initialize the environment, set up Docker services, MySQL database, and AWS S3 bucket by running:
