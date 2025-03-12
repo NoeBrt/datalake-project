@@ -3,7 +3,7 @@
 ## Prerequisites
 
 Ensure you have the following dependencies installed:
-- **DeepStream 7.0**
+- **DeepStream 7.0** (You can try just with the docker compose, should be fine)
 - **CUDA 12.x**
 - **NVIDIA Drivers**
 - **Docker**
