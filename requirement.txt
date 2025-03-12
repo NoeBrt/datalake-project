@@ -5,3 +5,4 @@ python-dotenv>=0.15.0
 pyarrow>=4.0.0
 aws
 mysql-connector-python
+dvc
