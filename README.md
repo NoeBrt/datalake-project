@@ -7,7 +7,7 @@ U|  _"\ u\| ___"|/  \/"_ \/U|  _"\ u  |"|    \| ___"|/     |_ " _|U |  _"\ u U  
  ||>>_    <<   >>     \\    ||>>_     //  \\  <<   >>      _// \\_  //   \\_  \\    >>  _// \\,-,>> \\,-.<<   >>   //   \\_     
 (__)__)  (__) (__)   (__)  (__)__)   (_")("_)(__) (__)    (__) (__)(__)  (__)(__)  (__)(__)(__)\.)   (_/(__) (__) (__)  (__)    
 ```
-With this project, we aimed to create an efficient and highly available pipeline to manage computer vision and tracking data from IoT devices.
+With this project, we aimed to create an efficient and highly available pipeline to manage high framerate real time computer vision and tracking data from IoT devices.
 
 https://github.com/user-attachments/assets/f7a32bf8-9c29-4fd9-880d-b0014a6534ad
 
