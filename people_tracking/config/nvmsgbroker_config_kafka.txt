@@ -1,0 +1,4 @@
+[converter]
+enable=1
+output-type=0      ; 0 for JSON output, 1 for Protobuf
+

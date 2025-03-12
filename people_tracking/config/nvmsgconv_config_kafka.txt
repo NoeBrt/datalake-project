@@ -1,0 +1,9 @@
+[kafka]
+# List of Kafka brokers
+metadata.broker.list=localhost:9092
+
+# The topic to which DeepStream will publish messages
+topic=quickstart-events
+
+# Provide the full path to the protocol adaptor library.
+proto-lib=/opt/nvidia/deepstream/deepstream/lib/libnvds_kafka_proto.so
