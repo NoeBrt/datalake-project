@@ -64,6 +64,38 @@ This system follows a structured pipeline for **real-time video analytics**:
 ### **2. Data Components**
 
 #### **Raw Data (Kafka Messages)**
+We use a Nvidia Deesptream pipeline with one YOLOV8s inference layer and a tracker  
+
+```
+     'v4l2src device="/dev/video0" '
+        '! capsfilter caps="image/jpeg, width=1920, height=1080, framerate=30/1" '
+        '! jpegdec '
+        '! videoconvert '
+        '! nvvideoconvert '
+        '! capsfilter caps="video/x-raw(memory:NVMM), format=RGBA, width=1920, height=1080, framerate=30/1" '
+        '! mux.sink_0 '
+
+        'nvstreammux name="mux" batch-size=1 width=1920 height=1080 '
+        'batched-push-timeout=4000000 live-source=1 num-surfaces-per-frame=1 '
+        'sync-inputs=0 max-latency=0 '
+
+        '! nvinfer name="primary-inference" '
+        '   config-file-path="./config/YOLOV8S.yml" '
+
+        '! nvtracker tracker-width=640 tracker-height=384 gpu-id=0 '
+        '   ll-lib-file="/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so" '
+        '   ll-config-file="./config/config_tracker_NvDCF_perf.yml" '  # <-- Adjust if needed
+
+        '! nvdsanalytics name="analytics" '
+        '   config-file="./config/analytics.txt" '
+
+        '! nvvideoconvert '
+        '! nvdsosd '
+        '! nveglglessink'
+```
+
+A probe callback process each frame and extract the metadata.
+
 - Kafka topic: `raw`
 - Format: JSON
 
@@ -220,7 +252,67 @@ wait_for_parquet >> curated
 
 ---
 
-If the DAGs are relatively simple, it's because the raw and staging processing functions are continuously sending data without interruption. We cannot integrate them into the DAGs without reducing the 'real-time' aspect of the pipeline. Instead, the DAGs focus on batch-oriented tasks, the ingestion of new parquet file in the curated layer.
+If the DAGs are relatively simple, it's because the raw and staging processing functions are continuously sending data without interruption. We cannot integrate them into the DAGs without reducing the 'real-time' aspect of the pipeline. Instead, the DAGs focus on batch-oriented tasks, the ingestion of new parquet file in the curated layer. The vision script and the process script are managed by the docker compose.
+
+```
+  vision:
+    build:
+      context: .
+      dockerfile: ./people_tracking/Dockerfile
+      args:
+        CUDA_VER: ${CUDA_VER}
+    container_name: tracking
+    image: tracking
+    depends_on:
+      - kafka
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./data:/data
+      - ./vision/cfg:/app/cfg
+    devices:
+      - /dev/video0
+    environment:
+      - TZ=Europe/Berlin
+      - CUDA_VER=12.2
+      - DISPLAY=:1
+      - KAFKA_BROKER=kafka:9092
+    working_dir: /app
+    command: python3 vision.py
+    restart: unless-stopped
+    privileged: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    shm_size: 7g
+
+
+  process_staging:
+    build:
+      context: .
+      dockerfile: ./dockerfile-staging
+    container_name: process_staging
+    volumes:
+      - ./data:/app/data  # Optional: Mount a data volume if needed
+    command: ["sh", "-c", "sleep 50 && python3 -u process_staging.py"] #we want the script to strat after raw
+    restart: unless-stopped
+    environment:
+      - KAFKA_BROKER=kafka:9092
+      - AWS_ACCESS_KEY_ID=root
+      - AWS_SECRET_ACCESS_KEY=root
+      - AWS_ENDPOINT_URL=http://localstack:4566
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    shm_size: 7g
+```
+
 
 ## **API Endpoints**
 
