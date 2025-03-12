@@ -74,8 +74,8 @@ Example Kafka message:
   "object_id": 0,
   "class_id": 0,
   "class_label": "person",
-  "confidence": 0.9389,
-  "top": 19.5162,
+  "confidence": 0.9389, #detection confidence
+  "top": 19.5162, #bounding boxes
   "left": 2.1036,
   "width": 1358.25,
   "height": 1052.39,
@@ -219,6 +219,8 @@ wait_for_parquet >> curated
 ```
 
 ---
+
+If the DAGs are relatively simple, it's because the raw and staging processing functions are continuously sending data without interruption. We cannot integrate them into the DAGs without reducing the 'real-time' aspect of the pipeline. Instead, the DAGs focus on batch-oriented tasks, the ingestion of new parquet file in the curated layer.
 
 ## **API Endpoints**
 
