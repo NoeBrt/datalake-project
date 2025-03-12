@@ -7,7 +7,7 @@ U|  _"\ u\| ___"|/  \/"_ \/U|  _"\ u  |"|    \| ___"|/     |_ " _|U |  _"\ u U  
  ||>>_    <<   >>     \\    ||>>_     //  \\  <<   >>      _// \\_  //   \\_  \\    >>  _// \\,-,>> \\,-.<<   >>   //   \\_     
 (__)__)  (__) (__)   (__)  (__)__)   (_")("_)(__) (__)    (__) (__)(__)  (__)(__)  (__)(__)(__)\.)   (_/(__) (__) (__)  (__)    
 ```
-With this projec
+With this project, we aimed to create an efficient and highly available pipeline to manage computer vision and tracking data from IoT devices.
 
 https://github.com/user-attachments/assets/f7a32bf8-9c29-4fd9-880d-b0014a6534ad
 
@@ -41,7 +41,7 @@ To initialize the environment, set up Docker services, MySQL database, and AWS S
 sh ./setup.sh
 ```
 
-⚠️ The **process staging**  sleep **50 seconds** before executing to avoid running when the topic is not created
+⚠️ The **process staging**  sleep **50 seconds** before executing to avoid running when the topic is not created.
 
 To gracefully stop Docker services, run:
 
@@ -56,10 +56,10 @@ docker compose down
 ### **1. Data Flow Overview**
 
 This system follows a structured pipeline for **real-time video analytics**:
-1. **Frame Extraction & Kafka Streaming** - DeepStream detects objects and streams metadata to Kafka.
-2. **Kafka to S3 (Staging)** - Messages are collected in batches and stored in Parquet files in an S3 bucket.
-3. **S3 to MySQL (Curated)** - Processed Parquet files are loaded into SQL tables for structured storage.
-4. **Airflow Orchestration** - Automates processing and ensures synchronization between S3 and MySQL.
+1. **Frame Extraction & Kafka Streaming** - DeepStream detects objects and streams metadata (sensor name, latitude, longitude) to Kafka. see ```people_tracking``` folder.
+2. **Kafka to S3 (Staging)** - Messages are collected in batches and stored in Parquet files in an S3 bucket. ```src/process_staging.py```
+3. **S3 to MySQL (Curated)** - Processed Parquet files are loaded into SQL tables for structured storage. ```src/process_curated.py```
+4. **Airflow Orchestration** - Automates processing and ensures synchronization between S3 and MySQL. ```dags/kafka_to_s3_to_sql_pipeline.py```
 
 ### **2. Data Components**
 
@@ -79,12 +79,12 @@ Example Kafka message:
   "left": 2.1036,
   "width": 1358.25,
   "height": 1052.39,
-  "sensor_id": "camera-01",
-  "mission_id": "mission-01",
-  "location_id": "location-01",
+  "sensor_id": "camera-01", #env variable to set for each iots
+  "mission_id": "mission-01", #env variable to set for each iots
+  "location_id": "location-01", #env variable to set for each iots
   "timestamp": "20250312-235445",
-  "latitude": "0.0",
-  "longitude": "0.0"
+  "latitude": "0.0", #env variable to set for each iots
+  "longitude": "0.0" #env variable to set for each iots
 }
 ```
 
@@ -92,7 +92,7 @@ Example Kafka message:
 - S3 bucket: `staging`
 - Format: Parquet
 - Messages are batched (size: **100 messages per file**)
-- **Filtering:** Only messages with `confidence > 0.3` are stored
+- **Filtering:** Only messages with `confidence > 0.3` are stored, timestamp validity is checked
 
 #### **Curated Data (SQL Tables)**
 - MySQL database: `curated`
@@ -221,6 +221,7 @@ wait_for_parquet >> curated
 ## **API Endpoints**
 
 ### **1. /raw**
+
 Fetches raw data from the Kafka topic.
 ```sh
 curl -X GET "http://localhost:8000/raw?duration=4"
@@ -234,7 +235,9 @@ result
 ```
 
 ### **2. /staging**
+
 Lists Parquet files in the staging S3 bucket.
+
 ```sh
 curl -X GET "http://localhost:8000/staging"
 ```
@@ -246,11 +249,12 @@ result
 ```
 
 Retrieve the contents of a specific Parquet file:
+
 ```sh
 curl -X GET "http://localhost:8000/staging?bucket=staging&file=data_20250312-233900.parquet"
 ```
 
-results
+result
 
 ```
 {"staging_files":["data_20250312-233900.parquet","data_20250312-234756.parquet","data_20250312-234807.parquet","data_20250312-234817.parquet","data_20250312-234828.parquet","data_20250312-234840.parquet","data_20250312-234850.parquet","data_20250312-234900.parquet","data_20250312-234912.parquet","data_20250312-234922.parquet","data_20250312-234934.parquet","data_20250312-234944.parquet","data_20250312-234956.parquet","data_20250312-235006.parquet","data_20250312-235016.parquet","data_20250312-235026.parquet","data_20250312-235038.parquet","data_20250312-235048.parquet","data_20250312-235059.parquet","data_20250312-235110.parquet"]}%
@@ -258,16 +262,38 @@ results
 
 
 ### **3. /curated**
+
 Fetches stored detections from MySQL.
 ```sh
 curl -X GET "http://localhost:8000/curated?table=detection"
 ```
 result
 
-```
+```sh
 ......ass_id":0,"class_label":"person","confidence":0.928223,"top":11.9856,"left":499.539,"width":1098.42,"height":1052.28,"timestamp":"2025-03-12T23:19:55","sensor_id":"camera-01"},{"frame_num":5812,"object_id":68,"class_id":0,"class_label":"person","confidence":0.928711,"top":9.93503,"left":496.719,"width":1097.61,"height":1055.58,"timestamp":"2025-03-12T23:19:55","sensor_id":"camera-01"},{"frame_num":5813,"object_id":68,"class_id":0,"class_label":"person","confidence":0.878906,"top":3.27233,"left":286.192,"width":1252.29,"height":1057.4,"timestamp":"2025-03-12T23:19:56","sensor_id":"camera-01"},{"frame_num":5814,"object_id":68,"class_id":0,"class_label":"person","confidence":0.813965,"top":0.0,"left":185.795,"width":1358.5,"height":1059.77,"timestamp":"2025-03-12T23:19:57","sensor_id":"camera-01"},{"frame_num":5815,"object_id":68,"class_id":0,"class_label":"person","confidence":0.788574,"top":0.0,"left":128.498,"width":1425.98,"height":1058.56,"timestamp":"2025-03-12T23:19:57","sensor_id":"camera-01"},{"frame_num":5816,"object_id":68,"class_id":0,"class_label":"person","confidence":0.785156,"top":0.0,"left":228.652,"width":1369.52,"height":1060.7,"timestamp":"2025-03-12T23:19:57","sensor_id":"camera-01"},{"frame_num":5817,"object_id":68,"class_id":0,"class_label":"person","confidence":0.926758,"top":18.5336,"left":348.15,"width":1260.85,"height":1052.78,"timestamp":"2025-03-12T23:19:58","sensor_id":"camera-01"}]}%
 ```
 
+Aggregation Table.
+```sh
+curl -X GET "http://localhost:8000/curated?table=aggregation"       
+```
+
+result
+```sh
+{"curated_data":[{"sensor_id":"camera-01","total_detections":14299,"average_confidence":0.867959,"max_confidence":0.962402,"min_confidence":0.300781,"most_frequent_class":"person","most_frequent_class_count":14299,"last_update":"2025-03-12T23:15:17"}]}%  
+```
+
+Sensor.
+
+```sh
+curl -X GET "http://localhost:8000/curated?table=sensor"       
+```
+
+result
+
+```sh
+{"curated_data":[{"sensor_id":"camera-01","mission_id":"mission-01","location_id":"location-01","latitude":0.0,"longitude":0.0}]}%
+```
 ---
 
 ## **Summary**
