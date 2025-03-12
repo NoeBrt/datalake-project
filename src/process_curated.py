@@ -29,6 +29,21 @@ def get_db_connection():
     conn = mysql.connector.connect(**db_config)
     return conn
 
+# Function to check if a file has been processed already
+def is_file_processed(conn, file_key):
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM processed_files WHERE file_key = %s", (file_key,))
+    result = cursor.fetchone()[0]
+    cursor.close()
+    return result > 0
+
+# Function to mark a file as processed
+def mark_file_processed(conn, file_key):
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO processed_files (file_key) VALUES (%s)", (file_key,))
+    conn.commit()
+    cursor.close()
+
 # Function to insert data into the sensor table
 def insert_sensor_data(conn, sensor_id, mission_id, location_id, latitude, longitude):
     cursor = conn.cursor()
@@ -142,7 +157,7 @@ def fill_aggregation_table():
     conn.close()
     print("Aggregation table has been filled successfully.")
 
-# Fetch parquet files from S3
+# Fetch parquet files from S3 with duplicate processing check
 def fetch_parquet_from_s3(bucket_name, prefix):
     # List objects in the S3 bucket
     response = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
@@ -150,6 +165,15 @@ def fetch_parquet_from_s3(bucket_name, prefix):
 
     for file in files:
         file_key = file['Key']
+        print(f"Found file: {file_key}")
+
+        # Connect to the database to check if file has been processed
+        conn = get_db_connection()
+        if is_file_processed(conn, file_key):
+            print(f"File {file_key} has already been processed. Skipping.")
+            conn.close()
+            continue
+
         print(f"Processing file: {file_key}")
 
         # Get the parquet file from S3
@@ -159,7 +183,7 @@ def fetch_parquet_from_s3(bucket_name, prefix):
         # Read the parquet file into a Pandas DataFrame
         df = pd.read_parquet(io.BytesIO(parquet_data))
 
-        # Process each record
+        # Process each record in the DataFrame
         for _, row in df.iterrows():
             detection_data = row.to_dict()
             sensor_id = detection_data['sensor_id']
@@ -169,13 +193,13 @@ def fetch_parquet_from_s3(bucket_name, prefix):
             longitude = detection_data.get('longitude', None)  # Get longitude if present
 
             # Insert sensor data if not already present
-            conn = get_db_connection()
             insert_sensor_data(conn, sensor_id, mission_id, location_id, latitude, longitude)
-
             # Insert detection data
             insert_detection_data(conn, detection_data)
 
-            conn.close()
+        # Mark the file as processed
+        mark_file_processed(conn, file_key)
+        conn.close()
 
 # Function to display the SQL schema and first 10 rows of each table
 def display_schema_and_samples():

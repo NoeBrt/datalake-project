@@ -1,6 +1,7 @@
-version: '3.8'
-
 services:
+
+
+
   ##############################
   # 1) ZooKeeper
   ##############################
@@ -8,12 +9,10 @@ services:
     image: confluentinc/cp-zookeeper:7.3.0
     container_name: zookeeper
     environment:
-      # Zookeeper requires a client port and a basic tick time
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
-    # The default Docker network allows other services to reach "zookeeper:2181"
 
   ##############################
   # 2) Kafka Broker
@@ -27,17 +26,10 @@ services:
       - "9092:9092"
       - "9094:9094"
     environment:
-      # Each broker needs a unique ID
       KAFKA_BROKER_ID: 1
-      # Point Kafka to the local Zookeeper container
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      #
-      # Expose Kafka internally and externally:
-      # - 0.0.0.0:9092 means "listen on all interfaces inside container"
-      # - 'PLAINTEXT://kafka:9092' is the advertised listener that internal clients use.
-      #
       KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,OUTSIDE://0.0.0.0:9094
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,OUTSIDE://localhost:9094      #
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,OUTSIDE://localhost:9094
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,OUTSIDE:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -54,32 +46,22 @@ services:
     container_name: tracking
     image: tracking
     depends_on:
-      - kafka   # ensures Kafka is started before vision
-    # If you need to map any ports from 'vision' to your host, do it here. Example:
-    # ports:
-    #   - "5000:5000"
-
+      - kafka
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - ./data:/data
       - ./vision/cfg:/app/cfg
-
-    # If you need your camera in the container:
     devices:
       - /dev/video0
-
     environment:
       - TZ=Europe/Berlin
       - CUDA_VER=12.2
       - DISPLAY=:1
-      # Let your vision app know how to connect to Kafka using the service name
       - KAFKA_BROKER=kafka:9092
-
     working_dir: /app
     command: python3 vision.py
     restart: unless-stopped
     privileged: true
-
     deploy:
       resources:
         reservations:
@@ -87,13 +69,34 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-
     ulimits:
       memlock: -1
       stack: 67108864
     shm_size: 7g
 
 
+  process_staging:
+    build:
+      context: .
+      dockerfile: ./dockerfile-staging
+    container_name: process_staging
+    volumes:
+      - ./data:/app/data  # Optional: Mount a data volume if needed
+    command: ["sh", "-c", "sleep 50 && python3 -u process_staging.py"] #we want the script to strat after raw
+    restart: unless-stopped
+    environment:
+      - KAFKA_BROKER=kafka:9092
+      - AWS_ACCESS_KEY_ID=root
+      - AWS_SECRET_ACCESS_KEY=root
+      - AWS_ENDPOINT_URL=http://localstack:4566
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    shm_size: 7g
+
+  ##############################
+  # 4) LocalStack (S3)
+  ##############################
   localstack:
     image: localstack/localstack
     container_name: localstack
@@ -103,11 +106,143 @@ services:
     environment:
       - SERVICES=s3
       - DOCKER_HOST=unix:///var/run/docker.sock
+
+  ##############################
+  # 5) MySQL (Curated Database)
+  ##############################
   mysql:
     image: mysql:latest
     container_name: mysql
     ports:
-      - "3307:3306"
+      - "3307:3306"  # Host:Container (Externally use 3307, inside use 3306)
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: curated
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  ##############################
+  # 6) Postgres (Airflow Metadata)
+  ##############################
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  ##############################
+  # 7) Airflow Webserver
+  ##############################
+  airflow-webserver:
+    build:
+      context: .
+      dockerfile: dockerfile-airflow
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+    image: apache/airflow:2.7.1
+    container_name: airflow-webserver
+    depends_on:
+      - postgres
+      - mysql  # Ensure MySQL is running before Airflow
+      - localstack
+    environment:
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - KAFKA_BROKER=kafka:9092
+      - MYSQL_HOST=mysql
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_DATABASE=curated
+      - MYSQL_PORT=3306  # Inside Docker, always use 3306
+      - AWS_ACCESS_KEY_ID=root
+      - AWS_SECRET_ACCESS_KEY=root
+      - AWS_ENDPOINT_URL=http://localstack:4566
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - ./src:/opt/airflow/scripts
+      - ./build:/opt/airflow/build
+    ports:
+      - "8081:8080"
+    command: webserver
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  ##############################
+  # 8) Airflow Scheduler
+  ##############################
+  airflow-scheduler:
+    build:
+      context: .
+      dockerfile: dockerfile-airflow
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+    image: apache/airflow:2.7.1
+    container_name: airflow-scheduler
+    depends_on:
+      - airflow-webserver
+      - mysql  # Ensure MySQL is running before Airflow
+      - localstack
+    environment:
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - KAFKA_BROKER=kafka:9092
+      - MYSQL_HOST=mysql
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_DATABASE=curated
+      - MYSQL_PORT=3306
+      - AWS_ACCESS_KEY_ID=root
+      - AWS_SECRET_ACCESS_KEY=root
+      - AWS_ENDPOINT_URL=http://localstack:4566
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - ./src:/opt/airflow/scripts
+      - ./build:/opt/airflow/build
+    command: scheduler
+
+  ##############################
+  # 9) Airflow Init
+  ##############################
+  airflow-init:
+    build:
+      context: .
+      dockerfile: dockerfile-airflow
+    image: apache/airflow:2.7.1
+    container_name: airflow-init
+    depends_on:
+      - postgres
+      - mysql
+      - localstack
+    environment:
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - _AIRFLOW_DB_UPGRADE=true
+      - _AIRFLOW_WWW_USER_CREATE=true
+      - _AIRFLOW_WWW_USER_USERNAME=airflow
+      - _AIRFLOW_WWW_USER_PASSWORD=airflow
+    command: version
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - ./src:/opt/airflow/scripts
+      - ./build:/opt/airflow/build
+
+volumes:
+  mysql_data:
+  postgres_data:

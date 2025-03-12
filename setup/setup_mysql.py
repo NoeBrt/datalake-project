@@ -13,7 +13,6 @@ db_config = {
     "port": int(os.getenv("MYSQL_PORT", "3307"))
 }
 
-
 # Function to connect to MySQL
 def get_db_connection():
     conn = mysql.connector.connect(**db_config)
@@ -32,7 +31,6 @@ def create_database():
     conn.commit()
     conn.close()
 
-
 # Function to create tables
 def create_tables():
     conn = get_db_connection()
@@ -49,25 +47,26 @@ def create_tables():
         );
     """)
 
+    # Create the detection table
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS detection (
-        frame_num INT,
-        object_id INT,
-        class_id INT,
-        class_label VARCHAR(255),
-        confidence FLOAT,
-        top FLOAT,
-        `left` FLOAT,
-        width FLOAT,
-        height FLOAT,
-        timestamp DATETIME,
-        sensor_id VARCHAR(255),
-        PRIMARY KEY (frame_num, object_id),
-        FOREIGN KEY (sensor_id) REFERENCES sensor(sensor_id)
-    );
-
+        CREATE TABLE IF NOT EXISTS detection (
+            frame_num INT,
+            object_id INT,
+            class_id INT,
+            class_label VARCHAR(255),
+            confidence FLOAT,
+            top FLOAT,
+            `left` FLOAT,
+            width FLOAT,
+            height FLOAT,
+            timestamp DATETIME,
+            sensor_id VARCHAR(255),
+            PRIMARY KEY (frame_num, object_id),
+            FOREIGN KEY (sensor_id) REFERENCES sensor(sensor_id)
+        );
     """)
 
+    # Create the aggregation table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS aggregation (
             sensor_id VARCHAR(255) PRIMARY KEY,
@@ -82,6 +81,13 @@ def create_tables():
         );
     """)
 
+    # Create the processed_files table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS processed_files (
+            file_key VARCHAR(255) PRIMARY KEY,
+            processed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    """)
 
     conn.commit()
     conn.close()

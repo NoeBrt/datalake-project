@@ -6,3 +6,5 @@ pyarrow>=4.0.0
 aws
 mysql-connector-python
 dvc
+fastapi
+uvicorn

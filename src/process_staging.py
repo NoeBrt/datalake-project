@@ -72,8 +72,6 @@ def save_to_parquet(messages, bucket, s3_client, output_dir="./output", local=Fa
 
 def preprocess_message(msg):
     df = pd.DataFrame(msg)
-    print(df)
-
     required_columns = ["frame_num", "object_id", "class_id", "class_label", "confidence", "top", "left", "width", "height", "timestamp", "sensor_id", "mission_id", "location_id", "latitude", "longitude"]
     df = df[required_columns]
     df['confidence'] = pd.to_numeric(df['confidence'], errors='coerce')  # Convert to float and coerce errors to NaN
