@@ -390,6 +390,28 @@ result
 ```sh
 {"curated_data":[{"sensor_id":"camera-01","mission_id":"mission-01","location_id":"location-01","latitude":0.0,"longitude":0.0}]}%
 ```
+
+### /health
+
+Verify the integrity of the principal service 
+
+```sh
+curl -X GET "http://localhost:8000/health"
+```
+result
+```
+[{"mysql":"OK"},{"kafka":"OK"},{"s3":"OK"},{"airflow":"OK"}]%       
+```
+### /stats
+Size of bucket and sql ingestion.
+```
+curl -X GET "http://localhost:8000/stats" 
+```
+
+result
+```
+{"s3_stats":{"bucket":"staging","file_count":559},"db_stats":{"aggregation":1,"detection":23430,"processed_files":913,"sensor":1}}% 
+```
 ---
 
 ## **Summary**
