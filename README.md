@@ -326,7 +326,13 @@ curl -X GET "http://localhost:8000/raw?duration=4"
 result
 
 ```
-{"raw_messages":[{"frame_num":216,"object_id":0,"class_id":0,"class_label":"person","confidence":0.9453125,"top":3.392106294631958,"left":0.0,"width":1362.9132080078125,"height":1064.5472412109375,"sensor_id":"camera-01","mission_id":"mission-01","location_id":"location-01","timestamp":"20250312-234822","latitude":"0.0","longitude":"0.0"},{"frame_num":217,"object_id":0,"class_id":0,"class_label":"person","confidence":0.94482421875,"top":2.865833044052124,"left":0.0,"width":1362.73974609375,"height":1064.9205322265625,"sensor_id":"camera-01","mission_id":"mission-01","location_id":"location-01","timestamp":"20250312-234822","latitude":"0.0","longitude":"0.0"},{"frame_num":218,"object_id":0,"class_id":0,"class_label":"person","confidence":0.94091796875,"top":2.3650896549224854,"left":0.0,"width":1363.4478759765625,"height":1065.3514404296875,"sensor_id":"camera-01","mission_id":"mission-01","location_id":"location-01","timestamp":"20250312-234822","latitude":"0.0","longitude":"0.0"},{"frame_num":219,"object_id":0,"class_id":0,"class_label":"person","confidence":0.94384765625,"top":4.28159761428833,"left":0.0,"width":1364.570068359375,"height":1064.8548583984375,"sensor_id":"camera-01","mission_id":"mission-01","location_id":"location-01","timestamp":"20250312-234823","latitude":"0.0","longitude":"0.0"},{"frame_num":220,"object_id":0,"class_id":0,"class_label":"person","confidence":0.94677734375,"top":5.832568645477295,"left":0.0,"width":1364.1424560546875,"height":1064.094482421875,"sensor_id":"camera-01","mission_id":"mission-01","location_id":"location-01","timestamp":"20250312-234823","latitude":"0.0","longitude":"0.0"},{"frame_num":221,"object_id":0,"class_id":0,"class_label":"person","confidence":0.94775390625,"top":5.079809188842773,"left":0.0,"width":1363.196044921875,"height":1064.263916015625,"sensor_id":"camera-01","mission_id":"mission-01","location_id":"location-01","timestamp":"20250312-234824","latitude":"0.0","longitude":"0.0"},{"frame_num":222,"object_id":0,"class_id":0,"class_label":"person","confidence":0.94677734375,"top":3.7932145595550537,"left":0.0,"width":1363.2630615234375,"height":1064.782470703125,"sensor_id":"camera-01","mission_id":"mission-01","location_id":"location-01","timestamp":"20250312-234824", ......
+{"raw_messages":[{"frame_num":216,"object_id":0,"class_id":0,"class_label":"person","confidence":0.9453125,"top":3.392106294631958,"left":0.0,"width":1362.9132080078125,"height":1064.5472412109375,"sensor_id":"camera-01","mission_id":"mission-01","location_id":"location-01","timestamp":"20250312-234822","latitude":"0.0","longitude":"0.0"},
+{"frame_num":217,"object_id":0,"class_id":0,"class_label":"person","confidence":0.94482421875,"top":2.865833044052124,"left":0.0,"width":1362.73974609375,"height":1064.9205322265625,"sensor_id":"camera-01","mission_id":"mission-01","location_id":"location-01","timestamp":"20250312-234822","latitude":"0.0","longitude":"0.0"},
+{"frame_num":218,"object_id":0,"class_id":0,"class_label":"person","confidence":0.94091796875,"top":2.3650896549224854,"left":0.0,"width":1363.4478759765625,"height":1065.3514404296875,"sensor_id":"camera-01","mission_id":"mission-01","location_id":"location-01","timestamp":"20250312-234822","latitude":"0.0","longitude":"0.0"},
+{"frame_num":219,"object_id":0,"class_id":0,"class_label":"person","confidence":0.94384765625,"top":4.28159761428833,"left":0.0,"width":1364.570068359375,"height":1064.8548583984375,"sensor_id":"camera-01","mission_id":"mission-01","location_id":"location-01","timestamp":"20250312-234823","latitude":"0.0","longitude":"0.0"},
+{"frame_num":220,"object_id":0,"class_id":0,"class_label":"person","confidence":0.94677734375,"top":5.832568645477295,"left":0.0,"width":1364.1424560546875,"height":1064.094482421875,"sensor_id":"camera-01","mission_id":"mission-01","location_id":"location-01","timestamp":"20250312-234823","latitude":"0.0","longitude":"0.0"},
+{"frame_num":221,"object_id":0,"class_id":0,"class_label":"person","confidence":0.94775390625,"top":5.079809188842773,"left":0.0,"width":1363.196044921875,"height":1064.263916015625,"sensor_id":"camera-01","mission_id":"mission-01","location_id":"location-01","timestamp":"20250312-234824","latitude":"0.0","longitude":"0.0"},
+{"frame_num":222,"object_id":0,"class_id":0,"class_label":"person","confidence":0.94677734375,"top":3.7932145595550537,"left":0.0,"width":1363.2630615234375,"height":1064.782470703125,"sensor_id":"camera-01","mission_id":"mission-01","location_id":"location-01","timestamp":"20250312-234824", ......
 
 ```
 
@@ -341,7 +347,9 @@ curl -X GET "http://localhost:8000/staging"
 result
 
 ```
-{"staging_files":["data_20250312-233900.parquet","data_20250312-234756.parquet","data_20250312-234807.parquet","data_20250312-234817.parquet","data_20250312-234828.parquet","data_20250312-234840.parquet","data_20250312-234850.parquet","data_20250312-234900.parquet","data_20250312-234912.parquet","data_20250312-234922.parquet","data_20250312-234934.parquet","data_20250312-234944.parquet","data_20250312-234956.parquet"]}%
+{"staging_files":["data_20250312-233900.parquet","data_20250312-234756.parquet","data_20250312-234807.parquet","data_20250312-234817.parquet","data_20250312-234828.parquet",
+"data_20250312-234840.parquet","data_20250312-234850.parquet","data_20250312-234900.parquet","data_20250312-234912.parquet","data_20250312-234922.parquet",
+"data_20250312-234934.parquet","data_20250312-234944.parquet","data_20250312-234956.parquet"]}%
 ```
 
 Retrieve the contents of a specific Parquet file:
@@ -353,7 +361,9 @@ curl -X GET "http://localhost:8000/staging?bucket=staging&file=data_20250312-233
 result
 
 ```
-{"staging_files":["data_20250312-233900.parquet","data_20250312-234756.parquet","data_20250312-234807.parquet","data_20250312-234817.parquet","data_20250312-234828.parquet","data_20250312-234840.parquet","data_20250312-234850.parquet","data_20250312-234900.parquet","data_20250312-234912.parquet","data_20250312-234922.parquet","data_20250312-234934.parquet","data_20250312-234944.parquet","data_20250312-234956.parquet","data_20250312-235006.parquet","data_20250312-235016.parquet","data_20250312-235026.parquet","data_20250312-235038.parquet","data_20250312-235048.parquet","data_20250312-235059.parquet","data_20250312-235110.parquet"]}%
+{"staging_files":["data_20250312-233900.parquet","data_20250312-234756.parquet","data_20250312-234807.parquet","data_20250312-234817.parquet","data_20250312-234828.parquet",
+"data_20250312-234840.parquet","data_20250312-234850.parquet","data_20250312-234900.parquet","data_20250312-234912.parquet","data_20250312-234922.parquet","data_20250312-234934.parquet","data_20250312-234944.parquet",
+"data_20250312-234956.parquet","data_20250312-235006.parquet","data_20250312-235016.parquet","data_20250312-235026.parquet","data_20250312-235038.parquet","data_20250312-235048.parquet","data_20250312-235059.parquet","data_20250312-235110.parquet"]}%
 ```
 
 
@@ -366,7 +376,12 @@ curl -X GET "http://localhost:8000/curated?table=detection"
 result
 
 ```sh
-......ass_id":0,"class_label":"person","confidence":0.928223,"top":11.9856,"left":499.539,"width":1098.42,"height":1052.28,"timestamp":"2025-03-12T23:19:55","sensor_id":"camera-01"},{"frame_num":5812,"object_id":68,"class_id":0,"class_label":"person","confidence":0.928711,"top":9.93503,"left":496.719,"width":1097.61,"height":1055.58,"timestamp":"2025-03-12T23:19:55","sensor_id":"camera-01"},{"frame_num":5813,"object_id":68,"class_id":0,"class_label":"person","confidence":0.878906,"top":3.27233,"left":286.192,"width":1252.29,"height":1057.4,"timestamp":"2025-03-12T23:19:56","sensor_id":"camera-01"},{"frame_num":5814,"object_id":68,"class_id":0,"class_label":"person","confidence":0.813965,"top":0.0,"left":185.795,"width":1358.5,"height":1059.77,"timestamp":"2025-03-12T23:19:57","sensor_id":"camera-01"},{"frame_num":5815,"object_id":68,"class_id":0,"class_label":"person","confidence":0.788574,"top":0.0,"left":128.498,"width":1425.98,"height":1058.56,"timestamp":"2025-03-12T23:19:57","sensor_id":"camera-01"},{"frame_num":5816,"object_id":68,"class_id":0,"class_label":"person","confidence":0.785156,"top":0.0,"left":228.652,"width":1369.52,"height":1060.7,"timestamp":"2025-03-12T23:19:57","sensor_id":"camera-01"},{"frame_num":5817,"object_id":68,"class_id":0,"class_label":"person","confidence":0.926758,"top":18.5336,"left":348.15,"width":1260.85,"height":1052.78,"timestamp":"2025-03-12T23:19:58","sensor_id":"camera-01"}]}%
+......ass_id":0,"class_label":"person","confidence":0.928223,"top":11.9856,"left":499.539,"width":1098.42,"height":1052.28,"timestamp":"2025-03-12T23:19:55","sensor_id":"camera-01"},
+{"frame_num":5812,"object_id":68,"class_id":0,"class_label":"person","confidence":0.928711,"top":9.93503,"left":496.719,"width":1097.61,"height":1055.58,"timestamp":"2025-03-12T23:19:55","sensor_id":"camera-01"},{"frame_num":5813,"object_id":68,"class_id":0,"class_label":"person","confidence":0.878906,"top":3.27233,"left":286.192,"width":1252.29,"height":1057.4,"timestamp":"2025-03-12T23:19:56","sensor_id":"camera-01"},
+{"frame_num":5814,"object_id":68,"class_id":0,"class_label":"person","confidence":0.813965,"top":0.0,"left":185.795,"width":1358.5,"height":1059.77,"timestamp":"2025-03-12T23:19:57","sensor_id":"camera-01"},
+{"frame_num":5815,"object_id":68,"class_id":0,"class_label":"person","confidence":0.788574,"top":0.0,"left":128.498,"width":1425.98,"height":1058.56,"timestamp":"2025-03-12T23:19:57","sensor_id":"camera-01"},
+{"frame_num":5816,"object_id":68,"class_id":0,"class_label":"person","confidence":0.785156,"top":0.0,"left":228.652,"width":1369.52,"height":1060.7,"timestamp":"2025-03-12T23:19:57","sensor_id":"camera-01"},
+{"frame_num":5817,"object_id":68,"class_id":0,"class_label":"person","confidence":0.926758,"top":18.5336,"left":348.15,"width":1260.85,"height":1052.78,"timestamp":"2025-03-12T23:19:58","sensor_id":"camera-01"}]}%
 ```
 
 Aggregation Table.
@@ -376,7 +391,8 @@ curl -X GET "http://localhost:8000/curated?table=aggregation"
 
 result
 ```sh
-{"curated_data":[{"sensor_id":"camera-01","total_detections":14299,"average_confidence":0.867959,"max_confidence":0.962402,"min_confidence":0.300781,"most_frequent_class":"person","most_frequent_class_count":14299,"last_update":"2025-03-12T23:15:17"}]}%  
+{"curated_data":[{"sensor_id":"camera-01","total_detections":14299,"average_confidence":0.867959,"max_confidence":0.962402,"min_confidence":0.300781,
+"most_frequent_class":"person","most_frequent_class_count":14299,"last_update":"2025-03-12T23:15:17"}]}%  
 ```
 
 Sensor.
