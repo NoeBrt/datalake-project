@@ -153,7 +153,7 @@ Example Kafka message:
 
 #### **Staging Data (S3 Parquet Files)**
 - S3 bucket: `staging`
-- Format: Parquet
+- Format: Parquet for a great compression level and efficient column oriented storage, optimizing performance for large-scale data analytics and reducing storage costs.
 - Messages are batched (size: **100 messages per file**)
 - **Filtering:** Only messages with `confidence > 0.3` are stored, timestamp validity is checked
 
