@@ -276,7 +276,44 @@ def health_check():
     ]
     return health_status
 
+# -------------------------
+# Stats endpoints
+# -------------------------
+def get_bucket_stats(bucket: str):
+    s3_client = init_s3_client()
+    try:
+        response = s3_client.list_objects_v2(Bucket=bucket)
+        file_count = len(response.get("Contents", []))
+    except Exception as e:
+        raise Exception(f"Error fetching stats for bucket '{bucket}': {e}")
+    return {"bucket": bucket, "file_count": file_count}
 
+def get_table_stats():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    stats = {}
+    try:
+        cursor.execute("SHOW TABLES;")
+        tables = [row[0] for row in cursor.fetchall()]
+        for table in tables:
+            cursor.execute(f"SELECT COUNT(*) FROM {table};")
+            count = cursor.fetchone()[0]
+            stats[table] = count
+    except Exception as e:
+        raise Exception(f"Error fetching table stats: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+    return stats
+
+@app.get("/stats")
+async def stats():
+    try:
+        s3_stats = await run_in_threadpool(get_bucket_stats, "staging")
+        db_stats = await run_in_threadpool(get_table_stats)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    return {"s3_stats": s3_stats, "db_stats": db_stats}
 # -------------------------
 # Run the application
 # -------------------------
