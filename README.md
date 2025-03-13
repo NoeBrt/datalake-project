@@ -163,7 +163,7 @@ Example Kafka message:
 
 ---
 
-## **Database Schema (MySQL)**
+## **Curated Database Schema (MySQL)**
 
 The MySQL database consists of the following tables:
 
