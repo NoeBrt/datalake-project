@@ -1,13 +1,44 @@
 ```
-  ____   U _____ u U  ___ u  ____      _     U _____ u      _____    ____        _        ____   _  __  U _____ u   ____        
-U|  _"\ u\| ___"|/  \/"_ \/U|  _"\ u  |"|    \| ___"|/     |_ " _|U |  _"\ u U  /"\  u U /"___| |"|/ /  \| ___"|/U |  _"\ u     
-\| |_) |/ |  _|"    | | | |\| |_) |/U | | u   |  _|"         | |   \| |_) |/  \/ _ \/  \| | u   | ' /    |  _|"   \| |_) |/     
- |  __/   | |___.-,_| |_| | |  __/   \| |/__  | |___        /| |\   |  _ <    / ___ \   | |/__U/| . \\u  | |___    |  _ <       
- |_|      |_____|\_)-\___/  |_|       |_____| |_____|      u |_|U   |_| \_\  /_/   \_\   \____| |_|\_\   |_____|   |_| \_\      
- ||>>_    <<   >>     \\    ||>>_     //  \\  <<   >>      _// \\_  //   \\_  \\    >>  _// \\,-,>> \\,-.<<   >>   //   \\_     
-(__)__)  (__) (__)   (__)  (__)__)   (_")("_)(__) (__)    (__) (__)(__)  (__)(__)  (__)(__)(__)\.)   (_/(__) (__) (__)  (__)    
+  ____   U _____ u U  ___ u  ____      _     U _____ u      _____    ____        _        ____   _  __  U _____ u   ____
+U|  _"\ u\| ___"|/  \/"_ \/U|  _"\ u  |"|    \| ___"|/     |_ " _|U |  _"\ u U  /"\  u U /"___| |"|/ /  \| ___"|/U |  _"\ u
+\| |_) |/ |  _|"    | | | |\| |_) |/U | | u   |  _|"         | |   \| |_) |/  \/ _ \/  \| | u   | ' /    |  _|"   \| |_) |/
+ |  __/   | |___.-,_| |_| | |  __/   \| |/__  | |___        /| |\   |  _ <    / ___ \   | |/__U/| . \\u  | |___    |  _ <
+ |_|      |_____|\_)-\___/  |_|       |_____| |_____|      u |_|U   |_| \_\  /_/   \_\   \____| |_|\_\   |_____|   |_| \_\
+ ||>>_    <<   >>     \\    ||>>_     //  \\  <<   >>      _// \\_  //   \\_  \\    >>  _// \\,-,>> \\,-.<<   >>   //   \\_
+(__)__)  (__) (__)   (__)  (__)__)   (_")("_)(__) (__)    (__) (__)(__)  (__)(__)  (__)(__)(__)\.)   (_/(__) (__) (__)  (__)
 ```
 With this project, we aimed to create an efficient and highly available pipeline to manage high framerate real time computer vision and tracking data from IoT devices.
+
+- [Prerequisites](#prerequisites)
+  - [python dependancies](#python-dependancies)
+- [Setup](#setup)
+- [**Architecture Overview**](#architecture-overview)
+  - [**1. Data Flow Overview**](#1-data-flow-overview)
+  - [**2. Data Components**](#2-data-components)
+    - [**Raw Data (Kafka Messages)**](#raw-data-kafka-messages)
+    - [**Staging Data (S3 Parquet Files)**](#staging-data-s3-parquet-files)
+    - [**Curated Data (SQL Tables)**](#curated-data-sql-tables)
+- [**Database Schema (MySQL)**](#database-schema-mysql)
+  - [**1. Sensor Table**](#1-sensor-table)
+  - [**2. Detection Table**](#2-detection-table)
+  - [**3. Aggregation Table**](#3-aggregation-table)
+  - [**4. Processed Files Table**](#4-processed-files-table)
+- [**Airflow Orchestration (DAGs)**](#airflow-orchestration-dags)
+  - [**DAG: kafka\_to\_s3\_to\_sql\_pipeline**](#dag-kafka_to_s3_to_sql_pipeline)
+    - [**DAG Tasks:**](#dag-tasks)
+    - [**DAG Code:**](#dag-code)
+- [**Endpoints**](#endpoints)
+  - [**2. /staging**](#2-staging)
+    - [**List files in the staging bucket**](#list-files-in-the-staging-bucket)
+    - [**Retrieve a specific Parquet file**](#retrieve-a-specific-parquet-file)
+  - [**3. /curated**](#3-curated)
+    - [**Retrieve detections**](#retrieve-detections)
+    - [**Retrieve aggregation data**](#retrieve-aggregation-data)
+    - [**Retrieve sensor information**](#retrieve-sensor-information)
+  - [**4. /health**](#4-health)
+  - [**5. /stats**](#5-stats)
+- [**Summary**](#summary)
+
 
 https://github.com/user-attachments/assets/f7a32bf8-9c29-4fd9-880d-b0014a6534ad
 
@@ -25,7 +56,7 @@ Ensure you have the following dependencies installed:
 - **Kafka**
 - **Apache Airflow**
 
-### python dependancies 
+### python dependancies
 
 ```
 python3 -m venv .venv
@@ -64,7 +95,7 @@ This system follows a structured pipeline for **real-time video analytics**:
 ### **2. Data Components**
 
 #### **Raw Data (Kafka Messages)**
-We use a Nvidia Deesptream pipeline with one YOLOV8s inference layer and a tracker  
+We use a Nvidia Deesptream pipeline with one YOLOV8s inference layer and a tracker
 
 ```
      'v4l2src device="/dev/video0" '
@@ -314,7 +345,7 @@ If the DAGs are relatively simple, it's because the raw and staging processing f
 ```
 ## **Endpoints**
 
-### **2. /staging**  
+### **2. /staging**
 Lists Parquet files in the staging S3 bucket.
 
 #### **List files in the staging bucket**
@@ -347,7 +378,7 @@ curl -X GET "http://localhost:8000/staging/read?bucket=staging&file_key=data_202
 
 ---
 
-### **3. /curated**  
+### **3. /curated**
 Fetch stored detections from MySQL.
 
 #### **Retrieve detections**
@@ -410,7 +441,7 @@ curl -X GET "http://localhost:8000/curated?table=sensor"
 
 ---
 
-### **4. /health**  
+### **4. /health**
 Verify the integrity of the main services.
 
 ```sh
@@ -427,7 +458,7 @@ curl -X GET "http://localhost:8000/health"
 
 ---
 
-### **5. /stats**  
+### **5. /stats**
 Check the size of the S3 bucket and database ingestion status.
 
 ```sh
