@@ -9,6 +9,9 @@ U|  _"\ u\| ___"|/  \/"_ \/U|  _"\ u  |"|    \| ___"|/     |_ " _|U |  _"\ u U  
 ```
 With this project, we aimed to create an efficient and highly available pipeline to manage high framerate real time computer vision and tracking data from IoT devices.
 
+https://github.com/user-attachments/assets/f7a32bf8-9c29-4fd9-880d-b0014a6534ad
+
+
 - [Prerequisites](#prerequisites)
   - [python dependancies](#python-dependancies)
 - [Setup](#setup)
@@ -40,7 +43,6 @@ With this project, we aimed to create an efficient and highly available pipeline
 - [**Summary**](#summary)
 
 
-https://github.com/user-attachments/assets/f7a32bf8-9c29-4fd9-880d-b0014a6534ad
 
 
 
