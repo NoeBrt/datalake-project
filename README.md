@@ -17,7 +17,7 @@ https://github.com/user-attachments/assets/f7a32bf8-9c29-4fd9-880d-b0014a6534ad
 
 Ensure you have the following dependencies installed:
 - **DeepStream 7.0** (You can try just with the docker compose, should be fine)
-- **CUDA 12.x**
+- **CUDA 12.2**
 - **NVIDIA Drivers**
 - **Docker**
 - **MySQL**
